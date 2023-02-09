@@ -3,11 +3,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
-#  Note Taker App
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-
 ## Links
 
 - The repo of the note app: [Source Code](https://)
@@ -53,7 +48,7 @@ THEN I am presented with empty fields to enter a new note title and the note’s
 * `More understanding of the power of functions and utilizing them`
 
 
-### RoadMap 🧭
+## RoadMap 🧭
  
  * `Create a test for the HTML files`
 
