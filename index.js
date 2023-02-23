@@ -110,7 +110,7 @@ const options = async () => {
     // : select === "add_department"
     // ? await addDepartment().then(() => options())
     //! ---
-    
+
     : dbConnect.end();
 };
 
@@ -176,16 +176,6 @@ const addEmployee = async () => {
     };
   });
   
-  // const [rows, fields] = await dbConnection.execute(gR());
-  // const roles = rows.map((role) => {
-  //   return { name: role.title, value: role.id };
-  // });
-
-  
-  // const [rows2, fields2] = await dbConnection.execute(gM());
-  // const managers = rows2.map((manager) => {
-  //   return { name: manager.first_name, value: manager.id };
-  // });
 
   const answers = await inquirer.prompt([
     {
@@ -250,7 +240,7 @@ const addEmployee = async () => {
 
 const updateEmployeeRole = async () => {
   const roles = await gR();
-  let map = roles.map((roles) => {
+  let mapped = roles.map((roles) => {
     return {
       name: roles.title,
       value: roles.role_id,
