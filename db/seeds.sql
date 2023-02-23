@@ -1,5 +1,5 @@
 INSERT INTO
-  departments_db (name)
+  department (name)
 VALUES
   ("Corporate"),
   ("HR"),
@@ -8,7 +8,7 @@ VALUES
 
 
 INSERT INTO
-  roles_db (title, salary, department_id)
+  roles (title, salary, department_id)
 VALUES
   ("Ceo", 90000, 1),
   ("Secretary", 35000, 2),
@@ -17,7 +17,7 @@ VALUES
 
 
 INSERT INTO
-  employees_db (first_name, last_name, role_id, manager_id)
+  employees (first_name, last_name, role_id, manager_id)
 VALUES
   ("Olu", "Akinyemi", 1, Null),
   ("Padong", "Xoing", 2, 1),
