@@ -6,7 +6,7 @@
 ## Links
 
 - The repo of the note app: [Source Code](https://github.com/EshuShango/employee-finder)
-- Here is the link of live demo [Demo]()
+- Here is the link of live demo [Demo](coming soon)
 
 
 ## Description 🔎
