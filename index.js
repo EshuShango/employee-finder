@@ -219,7 +219,7 @@ const addEmployee = async () => {
 
   console.log("==== 👌 Employee added successfully ====");
 
-  return console.table(sql);
+  return console.table(sql[0]);
 };
 
 const updateEmployeeRole = async () => {
