@@ -6,7 +6,7 @@
 ## Links
 
 - The repo of the note app: [Source Code](https://github.com/EshuShango/employee-finder)
-- Here is the link of live demo [Demo](coming soon)
+- Here is the link of live demo [Walkthrough video](https://watch.screencastify.com/v/lN17vErNadPKWxkW8nNf)
 
 
 ## Description 🔎
@@ -45,7 +45,8 @@ THEN I am prompted to select an employee to update and their new role and this i
 'click the license badge at the beginning of the document to get more info'
 
 ## Mock-Up 
-![mock up]()
+
+![mock up](./public/assets/Employee%20Finder.png)
 
 
 ## Things I Learned (still learning) 📚
