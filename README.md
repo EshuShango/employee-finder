@@ -49,6 +49,7 @@ THEN I am prompted to select an employee to update and their new role and this i
 
 
 ## Things I Learned (still learning) 📚
+* `Wow this one was a challenge, but i learned a lot and oddly I've grown a liking to MySQL `
 * `More understanding of the power of functions and utilizing them`
 * `How to manipulate and work with DataBase`
 * `How to work with inquirer and its' built in methods like: prompt`
