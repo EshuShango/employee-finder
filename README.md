@@ -48,12 +48,20 @@ THEN I am prompted to select an employee to update and their new role and this i
 ![mock up]()
 
 
-## Things I Learned 📚
+## Things I Learned (still learning) 📚
 * `More understanding of the power of functions and utilizing them`
+* `How to manipulate and work with DataBase`
+* `How to work with inquirer and its' built in methods like: prompt`
+* `How to work with and how mysql2 and it's built in methods  like: (wrapping my head around this still, but i've made some distance 😓) createPool(), createConnection(), and execute() vs the promise().query() , seem to work`
+* `Must Seed after creating the Database and it's tables !!!`
 
 
 ## RoadMap 🧭
  
- * `Create a test for the HTML files`
-
- * `Refactor code to be more efficient` 
+ * `Refactor code to be more clean and efficient` 
+### BONUS:
+ * `add the function to Delete departments, roles, and employees`
+ * `add the function to Update employee managers `
+ * `add the function to View employees by manager `
+ * `add the function to View employees by department`
+ * `add the function to View the total utilized budget of a department&mdash;in other words, the combined salaries of all employees in that department `

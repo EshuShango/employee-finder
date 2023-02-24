@@ -1,15 +1,9 @@
 const clear = require("clear");
 const figlet = require("figlet");
-const cTable = require("console.table");
 const inquirer = require("inquirer");
-const mysql = require("mysql2");
-const mysqlPromise = require("mysql2/promise");
-// const options = require('./public/src/options.js');
-// const procedure = require('./public/src/operations.js');
-// const procedure = require('./public/src/operation.js');
-// import clear from "clear";
-// import figlet from "figlet";
-// import options  from './public/src/options.js';
+const db = require("./public/config/connection");
+// const mysqlPromise = require("mysql2/promise");
+const cTable = require("console.table");
 
 const welScreen = async () => {
   clear();
@@ -36,28 +30,25 @@ const welScreen = async () => {
   );
 };
 
-const dbConnect = mysql.createPool(
-  {
-    host: "127.0.0.1",
-    user: "root",
-    password: "S1Q23LYm",
-    database: "employee_tracker_db",
-    // waitForConnections: true,
-    connectionLimit: 10,
-    // queueLimit: 0,
-    // port: 3306,
-  },
-  async () =>
-    await dbConnect.connect((err) => {
-      err ? console.log(err.message) : console.log(`db ${dbConnect.state}`);
-    })
-);
-
 const bgn = async () => {
   await welScreen();
   await options();
-  // await procedure();
 };
+
+//^---WHEN I....---
+//! WHEN I start the application
+//! THEN I am presented with the following options:
+//^---------
+//* view all employees,
+//* add an employee,
+//* update an employee role
+//^---------
+//* view all roles,
+//* add a role,
+
+//* view all departments,
+//* add a department,
+//^---------
 
 const options = async () => {
   const response = await inquirer.prompt([
@@ -66,7 +57,7 @@ const options = async () => {
       name: "select",
       message: "What would you like to do ?",
       choices: [
-        //^ Employees
+        //^ Employee
         { name: "View all Employees", value: "view_all_employee" },
         { name: "Add Employee", value: "add_employee" },
         { name: "Update Employee Role", value: "update_employee_role" },
@@ -75,7 +66,7 @@ const options = async () => {
         { name: "View all Roles", value: "view_all_roles" },
         { name: "Add Role", value: "add_role" },
 
-        //^ Departments
+        //^ Department
         { name: "View all Departments", value: "view_all_department" },
         { name: "Add Department", value: "add_department" },
 
@@ -86,98 +77,89 @@ const options = async () => {
 
         { name: "Exit", value: "exit" },
       ],
-      // name: 'select',
     },
   ]);
 
+  // const contPrompt = async () => {
+  //   await inquirer.prompt([
+  //     {
+  //       type: "confirm",
+  //       message: "Continue on ?"
+  //       name:"continue"
+  //     }
+  //   ]);
+  //   response.continue
+  //   ? await options()
+  //   : db.end()
+
+  // }
+
   const select = response.select;
 
-  //*EMPLS
-      select === "view_all_employee"
+  select === "view_all_employee"
     ? await viewAllEmployees().then(() => options())
     : select === "add_employee"
     ? await addEmployee().then(() => options())
     : select === "update_employee_role"
     ? await updateEmployeeRole().then(() => options())
-    
-    //! Others need to work before this are uncommented out
-    // : select === "view_all_roles"
-    // ? await viewAllRoles().then(() => options())
-    // : select === "add_role"
-    // ? await addRole().then(() => options())
-    // : select === "view_all_department"
-    // ? await viewAllDepartments().then(() => options())
-    // : select === "add_department"
-    // ? await addDepartment().then(() => options())
-    //! ---
-
-    : dbConnect.end();
+    : select === "view_all_roles"
+    ? await viewAllRoles().then(() => options())
+    : select === "add_role"
+    ? await addRole().then(() => options())
+    : select === "view_all_department"
+    ? await viewAllDepartments().then(() => options())
+    : select === "add_department"
+    ? await addDepartment().then(() => options())
+    : db.end();
 };
 
+const gR = async () => await db.promise().query("SELECT * FROM roles");
 
+const gD = async () => await db.promise().query("SELECT * FROM department");
 
-
-const gR = async () => {
-  const [fields] = await dbConnect
-  .promise()
-  .query("SELECT * FROM roles");
-  return fields;
-};
-const gD = async () => {
-  const [fields] = await dbConnect
-  .promise()
-  .query("SELECT * FROM department");
-  return fields;
-};
-const gM = async () => {
-  const [fields] = await dbConnect
+const gM = async () =>
+  await db
     .promise()
     .query("SELECT first_name FROM employee WHERE role_id = 3 ");
-  return fields;
-};
 
+//^ --------- EMPLOYEE
 const viewAllEmployees = async () => {
-  let [sql] = await dbConnect.promise().query(
+  let sql = await db.promise().query(
     `SELECT employee.employee_id AS id, employee.first_name, employee.last_name, 
-  roles.title, department.name AS department, 
-  roles.salary, 
-  manager.first_name AS manager 
-  FROM employee 
-  LEFT JOIN roles on employee.role_id = roles.role_id 
-  LEFT JOIN department on roles.department_id = department.id 
-  LEFT JOIN employee AS manager on employee.manager_id = manager.employee_id`
+    roles.title, department.name AS department, 
+    roles.salary, 
+    manager.first_name AS manager 
+    FROM employee 
+    LEFT JOIN roles on employee.role_id = roles.role_id 
+    LEFT JOIN department on roles.department_id = department.id 
+    LEFT JOIN employee AS manager on employee.manager_id = manager.employee_id`
   );
 
-  // const [rows, fields] = sql;
-  // console.table(rows);
-  return console.table(sql);
+  return console.table(sql[0]);
 };
 
 const addEmployee = async () => {
-  const roled = await gR();
-  //* const gR = async () => {
-  //   const [fields] = await dbConnect.promise().query('SELECT * FROM roles');
-  //   return fields;
-  //* };
+  const hired = await gR();
+  //? for whatever reason my data is an array within an array, this is forcing me
+  //? to select the first array,from an array
 
-  const managers = await gM();
-
-  let map = roled.map((roles) => {
+  let map = hired[0].map((roles) => {
     return {
       name: roles.title,
       value: roles.role_id,
     };
   });
 
-  let mapped = managers.map((manager) => {
+  const managers = await gM();
+
+  let mapped = managers[0].map((manager) => {
     return {
       name: manager.first_name,
       value: manager.role_id,
     };
   });
-  
 
-  const answers = await inquirer.prompt([
+  const response = await inquirer.prompt([
     {
       type: "input",
       name: "first_name",
@@ -204,50 +186,53 @@ const addEmployee = async () => {
       choices: [...mapped, "None"],
     },
   ]);
-  if (answers.manager === "None") {
-    answers.manager = null;
-  }
 
-  const [results] = await dbConnect
+  if (response.manager === "None") {
+    response.manager = null;
+  }
+  // ? (response.manager === "None") : response.manager = null;
+
+  const results = await db
     .promise()
     .query(
       `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
-      [answers.first_name, answers.last_name, answers.role_id, answers.manager],
+      [
+        response.first_name,
+        response.last_name,
+        response.role_id,
+        response.manager,
+      ],
       (err, results) => {
-        if (err) {
-          console.log(err);
-        }
-        console.log(results);
+        err ? console.log(err) : console.log(results);
       }
     );
 
+  let sql = await db.promise().query(`SELECT employee.employee_id AS id, 
+      employee.first_name, employee.last_name, 
+      roles.title, 
+      department.name AS department, roles.salary, 
+      manager.first_name AS manager 
+      FROM employee 
+      LEFT JOIN roles on (employee.role_id = roles.role_id) 
+      LEFT JOIN department on (roles.department_id = department.id) 
+      LEFT JOIN employee AS manager on (employee.manager_id = manager.employee_id)`);
 
-  let [sql] = await db.promise().query(`SELECT employee.employee_id AS id, 
-  employee.first_name, employee.last_name, 
-  roles.title, 
-  department.name AS department, roles.salary, 
-  manager.first_name AS manager 
-  FROM employee 
-  LEFT JOIN roles on (employee.role_id = roles.role_id) 
-  LEFT JOIN department on (roles.department_id = department.id) 
-  LEFT JOIN employee AS manager on (employee.manager_id = manager.employee_id)`);
-
-  console.log("==== Employee added successfully ====");
+  console.log("==== 👌 Employee added successfully ====");
 
   return console.table(sql);
-  
 };
 
 const updateEmployeeRole = async () => {
-  const roles = await gR();
-  let mapped = roles.map((roles) => {
+  const emply = await gR();
+  // console.log("Emply", emply[0]);
+  let map = emply[0].map((roles) => {
     return {
       name: roles.title,
       value: roles.role_id,
     };
   });
 
-  const answers = await inquirer.prompt([
+  const response = await inquirer.prompt([
     {
       type: "input",
       name: "employee_first_name",
@@ -262,27 +247,181 @@ const updateEmployeeRole = async () => {
     },
   ]);
 
-  const results = await dbConnect
+  const results = await db
     .promise()
     .query("UPDATE employee SET role_id = ? WHERE first_name = ?", [
-      answers.role_change,
-      answers.employee_first_name,
+      response.role_change,
+      response.employee_first_name,
     ]);
 
-  let [sql2] = await dbConnect
-    .promise()
-    .query(
-      `SELECT employee.employee_id AS id, employee.first_name, employee.last_name, 
-      roles.title, 
-      department.name AS department, roles.salary, 
-      manager.first_name AS manager 
-      FROM employee 
-      LEFT JOIN roles on (employee.role_id = roles.role_id) 
-      LEFT JOIN department on roles.department_id = department.id 
-      LEFT JOIN employee AS manager on employee.manager_id = manager.employee_id`
-    );
+  let sql2 = await db.promise().query(
+    `SELECT employee.employee_id AS id, employee.first_name, employee.last_name, 
+        roles.title, 
+        department.name AS department, roles.salary, 
+        manager.first_name AS manager 
+        FROM employee 
+        LEFT JOIN roles on (employee.role_id = roles.role_id) 
+        LEFT JOIN department on roles.department_id = department.id 
+        LEFT JOIN employee AS manager on employee.manager_id = manager.employee_id`
+  );
 
-  return console.table(sql2);
+  return console.table(sql2[0]);
+};
+//^ --------- ROLE
+
+const viewAllRoles = async () => {
+  let sql = await db.promise().query(
+    `SELECT roles.role_id AS id, roles.title, roles.salary,
+    department.name AS department
+    FROM roles
+   LEFT JOIN department ON roles.department_id = department.id`
+  );
+  // console.log("roles",sql[0]);
+  return console.table(sql[0]);
+};
+
+const addRole = async () => {
+  const add = await gD();
+
+  let map = add[0].map((department) => {
+    return {
+      name: department.name,
+      value: department.id,
+    };
+  });
+
+  const awr = await inquirer.prompt([
+    {
+      type: "input",
+      message: "Enter role title",
+      name: "title",
+    },
+    {
+      type: "input",
+      message: "Enter role salary",
+      name: "salary",
+    },
+    {
+      type: "list",
+      name: "department_id",
+      message: "Which Department: ",
+      choices: map,
+    },
+  ]);
+
+  const sql = await db.promise().query(
+    `
+ INSERT INTO roles(title, salary, department_id) 
+ VALUES (?,?,?)
+ `,
+    [awr.title, awr.salary, awr.department_id],
+    (err, sql) => {
+      err
+        ? console.log(err)
+        : console.log("==== 👌 Role added successfully ====");
+    }
+  );
+
+  //? How do i use a execute() method which is built into mysql2
+  //? and also display the table like the promise().query() methods ?
+
+  let sql2 = await db.promise().query(
+    `SELECT roles.role_id AS id, roles.title, roles.salary,
+  department.name AS department
+  FROM roles
+ LEFT JOIN department ON roles.department_id = department.id`
+  );
+
+  return console.table(sql2[0]);
+  //* const roled = await gR();
+
+  // console.log("roled", roled[0]);
+
+  //* let map = roled[0].map((roles) => {
+  //   return {
+  //     name: roles.title,
+  //     value: roles.role_id,
+  //   };
+  // });
+
+  //* const results = await db.promise().query(
+  //   `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
+  //   [
+  //     response.first_name,
+  //     response.last_name,
+  //     response.role_id,
+  //     response.manager,
+  //   ],
+  //   (err, results) => {
+  //     if (err) {
+  //       console.log(err);
+  //     }
+  //     console.log(results);
+  //   }
+  //*   );
+
+  //*   let sql = await db.promise().query(`SELECT employee.employee_id AS id,
+  //   employee.first_name, employee.last_name,
+  //   roles.title,
+  //   department.name AS department, roles.salary,
+  //   manager.first_name AS manager
+  //   FROM employee
+  //   LEFT JOIN roles on (employee.role_id = roles.role_id)
+  //   LEFT JOIN department on (roles.department_id = department.id)
+  //   LEFT JOIN employee AS manager on (employee.manager_id = manager.employee_id)`);
+
+  //   console.log("==== Employee added successfully ====");
+
+  //   return console.table(sql);
+};
+
+//^ --------- DEPARTMENT
+
+const viewAllDepartments = async () => {
+  //? is it possible to pass a function within an execute()
+  // let sql = await db.promise( console.log(gD())
+  // );
+
+  let sql = await db.promise().query(`
+  SELECT * FROM department
+  `);
+
+  return console.table(sql[0]);
+};
+const addDepartment = async () => {
+  const anwr = await inquirer.prompt([
+    {
+      type: "input",
+      message: "Enter a Department name",
+      name: "name",
+    },
+  ]);
+
+  const sql = await db.promise().query(`
+  INSERT INTO department (name) 
+  VALUES (?)`,
+    [anwr.name],
+    ((err, sql) => {
+      err
+        ? console.log(err)
+        : console.log("==== 👌 Department added successfully ====")
+    })
+  );
+
+  let sql2 = await db.promise().query(
+    `
+  SELECT * 
+  FROM department
+  WHERE name = ?`,
+    [anwr.name]
+  );
+
+  const dep = await db.promise().query(`
+  SELECT *
+  FROM department
+  `);
+
+  return console.table(dep[0]);
 };
 
 bgn();
